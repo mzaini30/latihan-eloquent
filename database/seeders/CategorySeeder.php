@@ -15,7 +15,7 @@ class CategorySeeder extends Seeder
     {
         $category = new Category();
         $category->name = "Food";
-        $category->descsription = "Food Category";
+        $category->description = "Food Category";
         $category->save();
     }
 }

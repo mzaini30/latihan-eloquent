@@ -42,4 +42,52 @@ class CategoryTest extends TestCase
         self::assertNotNull($category);
         self::assertEquals("Food", $category->name);
     }
+
+    public function testUpdate()
+    {
+        $this->seed(CategorySeeder::class);
+        $category = Category::find(1);
+        $category->name = "Food update";
+        $result = $category->update();
+        self::assertTrue($result);
+    }
+    public function testSelect()
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $category = new Category();
+            $category->name = "Category "  . $i;
+            $category->save();
+        }
+        $categories = Category::whereNull("description")->get();
+        self::assertEquals(5, $categories->count());
+        $categories->each(function ($category) {
+            $category->description = "updated";
+            $category->update();
+        });
+    }
+    public function testUpdateMany()
+    {
+        $categories = [];
+        for ($i = 0; $i < 10; $i++) {
+            $categories[] = [
+                "name" => "Name $i"
+            ];
+        }
+        $result = Category::insert($categories);
+        self::assertTrue($result);
+        Category::whereNull("description")->update([
+            "description" => "Updated"
+        ]);
+        $total = Category::where("description", "Updated")->count();
+        self::assertEquals(10, $total);
+    }
+    public function testDelete()
+    {
+        $this->seed(CategorySeeder::class);
+        $category = Category::find(1);
+        $result = $category->delete();
+        self::assertTrue($result);
+        $total = Category::count();
+        self::assertEquals(0, $total);
+    }
 }
