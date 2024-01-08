@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Scopes\IsActiveScope;
 use Database\Seeders\CategorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -105,5 +106,18 @@ class CategoryTest extends TestCase
         Category::whereNull("description")->delete();
         $total = Category::count();
         self::assertEquals(0, $total);
+    }
+    public function testRemoveGlobalScope()
+    {
+        $category = new Category();
+        $category->id = 1000;
+        $category->name = "Food";
+        $category->description = "Food Category";
+        $category->is_active = false;
+        $category->save();
+        $category = Category::find(1000);
+        self::assertNull($category);
+        $category = Category::withoutGlobalScopes([IsActiveScope::class])->find(1000);
+        self::assertNotNull($category);
     }
 }
